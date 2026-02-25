@@ -1,53 +1,79 @@
-Germana.html.
 <!DOCTYPE html>
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    <title>Germana Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Germana Expert ULTIMATE - Versiune Finală</title>
     <style>
-        :root { --bg-app: #f0f2f5; --bg-card: #ffffff; --f-size-read: 24px; --main-green: #28a745        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg-app); padding-top: 75px; }
-        #top-bar { position: fixed; top: 0; width: 100%; height: 70px; background: var(--main-green); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .nav-btns { display: flex; gap: 15px; }
-        .nav-icon { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 8px; font-size: 18px; }
+        :root { 
+            --bg-app: #f0f2f5; --bg-card: #ffffff; 
+            --f-size-read: 24px; --f-size-trans: 18px;
+            --main-green: #28a745;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg-app); padding-top: 75px; transition: 0.3s; }
+        
+        #top-bar { position: fixed; top: 0; width: 100%; height: 70px; background: var(--main-green); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); font-weight: bold; }
+        .nav-btns { display: flex; gap: 15px; align-items: center; }
+        .nav-icon { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 18px; }
+
         .grid-levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px; }
-        .lvl-btn { border: none; padding: 18px 5px; border-radius: 15px; color: white; font-weight: bold; font-size: 18px; background: #6c757d; box-shadow: 0 4px 0 #4a5157; }
+        .lvl-btn { border: none; padding: 18px 5px; border-radius: 15px; color: white; font-weight: bold; cursor: pointer; font-size: 18px; background: #6c757d; box-shadow: 0 4px 0 #4a5157; }
+        .lvl-btn:active { transform: translateY(3px); box-shadow: none; }
         .active-lvl { background: var(--main-green) !important; box-shadow: 0 4px 0 #1e7e34 !important; }
+
         .card { background: var(--bg-card); margin: 12px; padding: 20px; border-radius: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
         .hidden { display: none !important; }
+
         .audio-bar { position: sticky; top: 70px; background: white; z-index: 900; display: flex; justify-content: center; gap: 20px; padding: 10px; border-bottom: 2px solid #eee; margin: -20px -20px 20px -20px; border-radius: 18px 18px 0 0; }
-        .btn-circle { width: 45px; height: 45px; border-radius: 50%; border: none; background: #f8f9fa; font-size: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-circle { width: 45px; height: 45px; border-radius: 50%; border: none; background: #f8f9fa; cursor: pointer; font-size: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
         #reader-display { line-height: 1.8; font-size: var(--f-size-read); min-height: 250px; }
-        .word { cursor: pointer; padding: 0 3px; border-radius: 5px; display: inline-block; }
-        .highlight-green { background: #d4edda !important; color: #155724 !important; border: 1px solid #c3e6cb; }
-        #trans-box { min-height: 50px; background: #e9f7ef; color: #155724; font-weight: bold; text-align: center; margin-bottom: 15px; padding: 10px; border-radius: 10px; border-left: 5px solid var(--main-green); }
-        .test-opt { display: flex; align-items: center; background: #f8f9fa; border: 2px solid #eee; border-radius: 12px; margin: 10px 0; padding: 15px; font-size: 18px; }
-        .ans-correct { background: #d4edda !important; border-color: #28a745 !important; }
-        .ans-wrong { background: #f8d7da !important; border-color: #dc3545 !important; }
-        .side-panel { position: fixed; top: 0; right: 0; width: 90%; height: 100%; background: white; z-index: 2000; padding: 25px; transform: translateX(100%); transition: 0.4s; overflow-y: auto; }
+        .word { cursor: pointer; padding: 0 3px; border-radius: 5px; display: inline-block; transition: 0.2s; }
+        .highlight-green { background: #d4edda !important; color: #155724 !important; font-weight: bold; border: 1px solid #c3e6cb; }
+        
+        #trans-box { min-height: 50px; background: #e9f7ef; color: #155724; font-weight: bold; font-size: var(--f-size-trans); text-align: center; margin-bottom: 15px; padding: 10px; border-radius: 10px; border-left: 5px solid var(--main-green); }
+
+        .test-opt { display: flex; align-items: center; background: #f8f9fa; border: 2px solid #eee; border-radius: 12px; margin: 10px 0; padding: 15px; cursor: pointer; font-size: 18px; }
+        .ans-correct { background: #d4edda !important; border-color: #28a745 !important; color: #155724 !important; }
+        .ans-wrong { background: #f8d7da !important; border-color: #dc3545 !important; color: #721c24 !important; }
+
+        .side-panel { position: fixed; top: 0; right: 0; width: 90%; height: 100%; background: white; z-index: 2000; padding: 25px; box-shadow: -5px 0 20px rgba(0,0,0,0.2); transform: translateX(100%); transition: 0.4s; overflow-y: auto; }
         .side-panel.open { transform: translateX(0); }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border-radius: 10px; border: 1px solid #ddd; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #333; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; }
     </style>
 </head>
 <body>
+
 <div id="top-bar">
-    <div class="nav-btns"><button class="nav-icon" onclick="goHome()">⬅️</button></div>
-    <span>GERMANA MASTER</span>
+    <div class="nav-btns">
+        <button class="nav-icon" onclick="goHome()">⬅️</button>
+        <button class="nav-icon" onclick="history.forward()">➡️</button>
+    </div>
+    <span id="nav-title">GERMANA MASTER</span>
     <button onclick="toggleSet()" style="background:none; border:none; color:white; font-size:28px;">⚙️</button>
 </div>
-<div id="home-screen"><div class="grid-levels">
-    <button class="lvl-btn" onclick="openLvl('A1')">A1</button><button class="lvl-btn" onclick="openLvl('A2')">A2</button>
-    <button class="lvl-btn" onclick="openLvl('B1')">B1</button><button class="lvl-btn" onclick="openLvl('B2')">B2</button>
-    <button class="lvl-btn" onclick="openLvl('C1')">C1</button><button class="lvl-btn" onclick="openLvl('C2')">C2</button>
-</div></div>
+
+<div id="home-screen">
+    <div class="grid-levels">
+        <button class="lvl-btn" onclick="openLvl('A1')">A1</button>
+        <button class="lvl-btn" onclick="openLvl('A2')">A2</button>
+        <button class="lvl-btn" onclick="openLvl('B1')">B1</button>
+        <button class="lvl-btn" onclick="openLvl('B2')">B2</button>
+        <button class="lvl-btn" onclick="openLvl('C1')">C1</button>
+        <button class="lvl-btn" onclick="openLvl('C2')">C2</button>
+    </div>
+</div>
+
 <div id="lvl-screen" class="card hidden">
     <div style="display:flex; gap:10px; margin-bottom:20px;">
-        <button class="lvl-btn active-lvl" style="flex:1" onclick="switchTab('L')">Lecturi</button>
-        <button class="lvl-btn active-lvl" style="flex:1" onclick="switchTab('T')">Teste</button>
+        <button class="lvl-btn active-lvl" style="flex:2" onclick="switchTab('L')">Lecturi</button>
+        <button class="lvl-btn active-lvl" style="flex:2" onclick="switchTab('T')">Teste</button>
     </div>
     <div id="content-list"></div>
 </div>
+
 <div id="work-screen" class="card hidden">
     <div id="audio-ui" class="audio-bar hidden">
         <button class="btn-circle" onclick="playAll()">▶️</button>
@@ -55,94 +81,225 @@ Germana.html.
         <button class="btn-circle" onclick="pauseAudio()">⏸️</button>
         <button class="btn-circle" onclick="stopAudio()">⏹️</button>
     </div>
-    <div id="trans-box">Apasă pe cuvinte</div>
+    <div id="trans-box">Apasă pe cuvinte pentru traducere</div>
     <div id="reader-display"></div>
-    <div id="test-ui" class="hidden"></div>
-    <button class="lvl-btn" style="width:100%; margin-top:25px; background:#6c757d" onclick="backToList()">⬅️ ÎNAPOI</button>
+    <div id="test-ui" class="hidden" style="margin-top:20px;"></div>
+    <button class="lvl-btn" style="width:100%; margin-top:25px; background:#6c757d" onclick="backToList()">⬅️ Înapoi la listă</button>
 </div>
+
 <div id="set-panel" class="side-panel">
     <h3>⚙️ Setări & Backup</h3>
-    <label>Culoare Fundal:</label><input type="color" id="cfg-bg" onchange="applyCfg()">
-    <label>Font: <span id="val-f1">24</span>px</label><input type="range" id="cfg-f1" min="14" max="40" value="24" oninput="applyCfg()">
-    <label>Viteză Voce:</label><input type="range" id="cfg-rate" min="0.4" max="1.6" step="0.1" value="1" onchange="applyCfg()">
+    
+    <label>Culoare Fundal:</label>
+    <input type="color" id="cfg-bg" onchange="applyCfg()">
+    
+    <label>Font Lectură: <span id="val-f1">24</span>px</label>
+    <input type="range" id="cfg-f1" min="14" max="40" value="24" oninput="applyCfg()">
+    
+    <label>Viteză Voce:</label>
+    <input type="range" id="cfg-rate" min="0.4" max="1.6" step="0.1" value="1" onchange="applyCfg()">
+
     <hr>
     <h3>➕ Adaugă Material</h3>
     <select id="in-lvl"><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select>
     <select id="in-type"><option value="L">📄 Lectură</option><option value="T">🧠 Test</option></select>
     <input type="text" id="in-title" placeholder="Titlu">
     <textarea id="in-body" style="height:100px" placeholder="Conținut..."></textarea>
+    
     <button class="lvl-btn active-lvl" style="width:100%; margin-top:10px;" onclick="saveData()">💾 SALVEAZĂ</button>
+
     <hr>
     <button class="lvl-btn" style="width:100%; background:#007bff" onclick="doExport()">📥 SALVEAZĂ BACKUP</button>
+    
     <div style="margin-top:15px;">
         <label>Restaurare Date (.json):</label>
         <input type="file" id="import-file" accept=".json" onchange="doImport(this)">
     </div>
+    
     <button class="lvl-btn" style="width:100%; background:#343a40; margin-top:20px" onclick="toggleSet()">ÎNCHIDE</button>
 </div>
+
 <script>
     let db = JSON.parse(localStorage.getItem('gm_db_v3') || '{"A1":[],"A2":[],"B1":[],"B2":[],"C1":[],"C2":[]}');
+    let mistakes = JSON.parse(localStorage.getItem('gm_mistakes') || '[]');
     let config = JSON.parse(localStorage.getItem('gm_config') || '{"bg":"#f0f2f5","font":"24","rate":"1"}');
     let curLvl = '', curTab = 'L', curSession = [], curIdx = 0, score = 0, synth = window.speechSynthesis;
+
     window.onload = () => { loadCfg(); };
-    function applyCfg(s=true) {
-        config.bg = document.getElementById('cfg-bg').value; config.font = document.getElementById('cfg-f1').value; config.rate = document.getElementById('cfg-rate').value;
-        document.body.style.background = config.bg; document.documentElement.style.setProperty('--f-size-read', config.font + 'px');
-        document.getElementById('val-f1').innerText = config.font; if(s) localStorage.setItem('gm_config', JSON.stringify(config));
+
+    function loadCfg() {
+        document.getElementById('cfg-bg').value = config.bg;
+        document.getElementById('cfg-f1').value = config.font;
+        document.getElementById('cfg-rate').value = config.rate;
+        applyCfg(false);
     }
-    function loadCfg() { document.getElementById('cfg-bg').value = config.bg; document.getElementById('cfg-f1').value = config.font; document.getElementById('cfg-rate').value = config.rate; applyCfg(false); }
-    function openLvl(l) { curLvl = l; document.getElementById('home-screen').classList.add('hidden'); document.getElementById('lvl-screen').classList.remove('hidden'); switchTab('L'); }
+
+    function applyCfg(save = true) {
+        config.bg = document.getElementById('cfg-bg').value;
+        config.font = document.getElementById('cfg-f1').value;
+        config.rate = document.getElementById('cfg-rate').value;
+        document.body.style.background = config.bg;
+        document.documentElement.style.setProperty('--f-size-read', config.font + 'px');
+        document.getElementById('val-f1').innerText = config.font;
+        if(save) localStorage.setItem('gm_config', JSON.stringify(config));
+    }
+
+    function openLvl(l) {
+        curLvl = l;
+        document.getElementById('home-screen').classList.add('hidden');
+        document.getElementById('lvl-screen').classList.remove('hidden');
+        document.getElementById('nav-title').innerText = "Nivel " + l;
+        switchTab('L');
+    }
+
     function switchTab(t) { curTab = t; renderList(); }
+
     function renderList() {
+        let container = document.getElementById('content-list');
         let items = db[curLvl].filter(i => i.type === curTab);
-        document.getElementById('content-list').innerHTML = items.map((item, idx) => `
+        container.innerHTML = items.map((item, idx) => `
             <div style="padding:15px; background:#fff; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #eee;">
-                <span onclick="startWork('${curLvl}', ${db[curLvl].indexOf(item)})" style="flex:1; font-weight:bold;">${item.title}</span>
-                <button onclick="delItem('${curLvl}', ${db[curLvl].indexOf(item)})" style="color:red; border:none; background:none;">X</button>
-            </div>`).join('') || 'Gol';
+                <span onclick="startWork('${curLvl}', ${db[curLvl].indexOf(item)})" style="cursor:pointer; flex:1; font-weight:bold;">${curTab==='L'?'📄':'🧠'} ${item.title}</span>
+                <button onclick="delItem('${curLvl}', ${db[curLvl].indexOf(item)})" style="color:#ff4d4d; border:none; background:none; font-weight:bold; padding:10px;">X</button>
+            </div>
+        `).join('') || '<p style="text-align:center;">Gol.</p>';
     }
+
     function startWork(l, idx) {
-        let item = db[l][idx]; document.getElementById('lvl-screen').classList.add('hidden'); document.getElementById('work-screen').classList.remove('hidden');
-        if(item.type === 'L') { document.getElementById('audio-ui').classList.remove('hidden'); document.getElementById('test-ui').classList.add('hidden'); renderReading(item.body); }
-        else { document.getElementById('audio-ui').classList.add('hidden'); document.getElementById('test-ui').classList.remove('hidden'); initTest(item.body); }
+        let item = db[l][idx];
+        document.getElementById('lvl-screen').classList.add('hidden');
+        document.getElementById('work-screen').classList.remove('hidden');
+        if(item.type === 'L') {
+            document.getElementById('audio-ui').classList.remove('hidden');
+            document.getElementById('test-ui').classList.add('hidden');
+            renderReading(item.body);
+        } else {
+            document.getElementById('audio-ui').classList.add('hidden');
+            document.getElementById('test-ui').classList.remove('hidden');
+            initSmartTest(item.body);
+        }
     }
-    function renderReading(txt) { document.getElementById('reader-display').innerHTML = txt.split(/\s+/).map(w => `<span class="word" onclick="trans(this)">${w}</span>`).join(' '); }
+
+    function renderReading(txt) {
+        document.getElementById('reader-display').innerHTML = txt.split(/\s+/).map(w => `<span class="word" onclick="trans(this)">${w}</span>`).join(' ');
+    }
+
     async function trans(el) {
-        document.querySelectorAll('.word').forEach(w => w.classList.remove('highlight-green')); el.classList.add('highlight-green');
-        let w = el.innerText.replace(/[.,!?;:]/g, ''); document.getElementById('trans-box').innerText = "...";
-        try { let res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=de&tl=ro&dt=t&q=${w}`); let d = await res.json(); document.getElementById('trans-box').innerText = d[0][0][0]; } catch(e) { document.getElementById('trans-box').innerText = "Eroare"; }
+        document.querySelectorAll('.word').forEach(w => w.classList.remove('highlight-green'));
+        el.classList.add('highlight-green');
+        let w = el.innerText.replace(/[.,!?;:()]/g, '');
+        document.getElementById('trans-box').innerText = "Traducere...";
+        try {
+            let res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=de&tl=ro&dt=t&q=${w}`);
+            let data = await res.json();
+            document.getElementById('trans-box').innerText = data[0][0][0];
+        } catch(e) { document.getElementById('trans-box').innerText = "Eroare"; }
     }
-    function initTest(raw) {
-        let pool = raw.split('\n').filter(l => l.includes('|')).map(line => { let p = line.split('|').map(x => x.trim()); return { q: p[0], cor: p[1], all: p.slice(1) }; });
-        curSession = pool.sort(() => 0.5 - Math.random()).slice(0, 10); curIdx = 0; score = 0; showQ();
+
+    function initSmartTest(raw) {
+        let pool = raw.split('\n').filter(l => l.includes('|')).map(line => {
+            let p = line.split('|').map(x => x.trim());
+            return { q: p[0], cor: p[1], all: p.slice(1) };
+        });
+        let size = parseInt(prompt("Câte întrebări?", "10")) || 10;
+        let misPool = mistakes.sort(() => 0.5 - Math.random()).slice(0, 2);
+        let fresh = pool.sort(() => 0.5 - Math.random()).slice(0, size - misPool.length);
+        curSession = [...misPool, ...fresh].sort(() => 0.5 - Math.random());
+        curIdx = 0; score = 0; showQ();
     }
+
     function showQ() {
-        if(curIdx >= curSession.length) { document.getElementById('reader-display').innerHTML = `<h3>Scor: ${score}/${curSession.length}</h3>`; return; }
-        let itm = curSession[curIdx]; document.getElementById('reader-display').innerHTML = `<h3>${itm.q}</h3>`;
-        document.getElementById('test-ui').innerHTML = itm.all.sort(() => 0.5 - Math.random()).map(o => `<div class="test-opt" onclick="evalAns(this, '${o}', '${itm.cor}')">${o}</div>`).join('');
+        if(curIdx >= curSession.length) { 
+            document.getElementById('reader-display').innerHTML = `<h2>Scor: ${score}/${curSession.length}</h2>`;
+            document.getElementById('test-ui').innerHTML = `<button class="lvl-btn active-lvl" style="width:100%" onclick="backToList()">FINAL</button>`;
+            return; 
+        }
+        let itm = curSession[curIdx];
+        let qTxt = itm.q.split(/\s+/).map(w => `<span class="word" onclick="trans(this)">${w}</span>`).join(' ');
+        document.getElementById('reader-display').innerHTML = `<h3>${qTxt}</h3>`;
+        let html = itm.all.sort(() => 0.5 - Math.random()).map(o => {
+            let words = o.split(/\s+/).map(w => `<span class="word" onclick="trans(this); event.stopPropagation();">${w}</span>`).join(' ');
+            return `<div class="test-opt" data-ans="${o}" onclick="evalAns(this, '${o}', '${itm.cor}')"><div>${words}</div></div>`;
+        }).join('');
+        document.getElementById('test-ui').innerHTML = html;
     }
+
     function evalAns(el, sel, cor) {
-        if(sel === cor) { el.classList.add('ans-correct'); score++; } else { el.classList.add('ans-wrong'); document.querySelectorAll('.test-opt').forEach(opt => { if(opt.innerText === cor) opt.classList.add('ans-correct'); }); }
-        setTimeout(() => { curIdx++; showQ(); }, 1500);
+        const options = document.querySelectorAll('.test-opt');
+        options.forEach(o => o.style.pointerEvents = 'none');
+        let itm = curSession[curIdx];
+        if(sel === cor) {
+            el.classList.add('ans-correct'); score++;
+            mistakes = mistakes.filter(m => m.q !== itm.q);
+        } else {
+            el.classList.add('ans-wrong');
+            options.forEach(o => { if(o.getAttribute('data-ans') === cor) o.classList.add('ans-correct'); });
+            if(!mistakes.some(m => m.q === itm.q)) mistakes.push(itm);
+        }
+        localStorage.setItem('gm_mistakes', JSON.stringify(mistakes));
+        setTimeout(() => { curIdx++; showQ(); }, 1800);
     }
-    function playAll() { synth.cancel(); let ut = new SpeechSynthesisUtterance(document.getElementById('reader-display').innerText); ut.lang = 'de-DE'; ut.rate = config.rate; synth.speak(ut); }
-    function playSelect() { 
-        let s = window.getSelection().toString(); 
-        if(!s) { alert("Selectează textul (să fie albastru)!"); return; }
-        synth.cancel(); let ut = new SpeechSynthesisUtterance(s); ut.lang = 'de-DE'; ut.rate = config.rate; synth.speak(ut); 
+
+    function playAll() { 
+        synth.cancel();
+        let ut = new SpeechSynthesisUtterance(document.getElementById('reader-display').innerText);
+        ut.lang = 'de-DE'; ut.rate = config.rate; synth.speak(ut);
     }
+
+    function playSelect() {
+        let textToRead = "";
+        if (window.getSelection) {
+            textToRead = window.getSelection().toString();
+        } else if (document.selection && document.selection.type != "Control") {
+            textToRead = document.selection.createRange().text;
+        }
+
+        if (!textToRead || textToRead.trim() === "") {
+            alert("Selectează textul cu degetul (să apară albastru) înainte de a apăsa 🎯");
+            return;
+        }
+        synth.cancel();
+        let ut = new SpeechSynthesisUtterance(textToRead);
+        ut.lang = 'de-DE'; ut.rate = config.rate;
+        synth.speak(ut);
+    }
+
     function pauseAudio() { synth.pause(); }
     function stopAudio() { synth.cancel(); }
-    function goHome() { document.getElementById('lvl-screen').classList.add('hidden'); document.getElementById('work-screen').classList.add('hidden'); document.getElementById('home-screen').classList.remove('hidden'); stopAudio(); }
+
+    function saveData() {
+        let l = document.getElementById('in-lvl').value, t = document.getElementById('in-type').value;
+        let title = document.getElementById('in-title').value, body = document.getElementById('in-body').value;
+        if(!title || !body) return alert("Completează titlul și conținutul!");
+        db[l].push({ title, body, type: t });
+        localStorage.setItem('gm_db_v3', JSON.stringify(db));
+        alert("Material salvat cu succes!"); renderList();
+    }
+
+    function goHome() { 
+        document.getElementById('lvl-screen').classList.add('hidden');
+        document.getElementById('work-screen').classList.add('hidden');
+        document.getElementById('home-screen').classList.remove('hidden');
+        document.getElementById('nav-title').innerText = "GERMANA MASTER";
+        stopAudio();
+    }
     function backToList() { document.getElementById('work-screen').classList.add('hidden'); document.getElementById('lvl-screen').classList.remove('hidden'); stopAudio(); }
     function toggleSet() { document.getElementById('set-panel').classList.toggle('open'); }
-    function saveData() {
-        let l = document.getElementById('in-lvl').value, t = document.getElementById('in-type').value, title = document.getElementById('in-title').value, body = document.getElementById('in-body').value;
-        if(!title || !body) return alert("Completează tot!");
-        db[l].push({ title, body, type: t }); localStorage.setItem('gm_db_v3', JSON.stringify(db)); alert("Salvat!"); renderList();
+    
+    function doExport() {
+        let data = { db, mistakes, config };
+        let blob = new Blob([JSON.stringify(data)], {type:"application/json"});
+        let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download="backup_germana.json"; a.click();
     }
-    function doExport() { let blob = new Blob([JSON.stringify({db, config})], {type:"application/json"}); let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download="backup_germana.json"; a.click(); }
-    function doImport(i) { let r = new FileReader(); r.onload = (e) => { let d = JSON.parse(e.target.result); db=d.db; localStorage.setItem('gm_db_v3', JSON.stringify(db)); location.reload(); }; r.readAsText(i.files[0]); }
+    function doImport(input) {
+        let file = input.files[0]; if(!file) return;
+        let r = new FileReader();
+        r.onload = (e) => {
+            let d = JSON.parse(e.target.result);
+            if(d.db) { db=d.db; mistakes=d.mistakes||[]; config=d.config||config; localStorage.setItem('gm_db_v3', JSON.stringify(db)); location.reload(); }
+        };
+        r.readAsText(file);
+    }
     function delItem(l, idx) { if(confirm("Ștergi?")) { db[l].splice(idx, 1); localStorage.setItem('gm_db_v3', JSON.stringify(db)); renderList(); } }
 </script>
 </body>
