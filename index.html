@@ -25,6 +25,7 @@
         .card { background: var(--bg-card); margin: 12px; padding: 20px; border-radius: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
         .hidden { display: none !important; }
 
+        /* Audio bar rămâne sticky */
         .audio-bar { position: sticky; top: 70px; background: white; z-index: 900; display: flex; justify-content: center; gap: 20px; padding: 10px; border-bottom: 2px solid #eee; margin: -20px -20px 20px -20px; border-radius: 18px 18px 0 0; }
         .btn-circle { width: 45px; height: 45px; border-radius: 50%; border: none; background: #f8f9fa; cursor: pointer; font-size: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
@@ -32,7 +33,23 @@
         .word { cursor: pointer; padding: 0 3px; border-radius: 5px; display: inline-block; transition: 0.2s; position: relative; z-index: 10; }
         .highlight-green { background: #d4edda !important; color: #155724 !important; font-weight: bold; border: 1px solid #c3e6cb; }
         
-        #trans-box { min-height: 50px; background: #e9f7ef; color: #155724; font-weight: bold; font-size: var(--f-size-trans); text-align: center; margin-bottom: 15px; padding: 10px; border-radius: 10px; border-left: 5px solid var(--main-green); }
+        /* MODIFICARE: Trans-box devine sticky sub butoanele audio */
+        #trans-box { 
+            position: sticky; 
+            top: 135px; /* Apare sub audio-bar */
+            z-index: 850;
+            min-height: 50px; 
+            background: #e9f7ef; 
+            color: #155724; 
+            font-weight: bold; 
+            font-size: var(--f-size-trans); 
+            text-align: center; 
+            margin-bottom: 15px; 
+            padding: 10px; 
+            border-radius: 10px; 
+            border-left: 5px solid var(--main-green);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
 
         .test-opt { display: flex; align-items: center; background: #f8f9fa; border: 2px solid #eee; border-radius: 12px; margin: 10px 0; padding: 15px; cursor: pointer; font-size: 18px; position: relative; }
         .ans-correct { background: #d4edda !important; border-color: #28a745 !important; color: #155724 !important; }
@@ -43,14 +60,13 @@
         .glow-ui { background: #d4edda !important; box-shadow: 0 0 20px var(--main-green); }
         .blank-space { border-bottom: 3px solid #555; min-width: 60px; display: inline-block; text-align: center; color: var(--main-green); font-weight: bold; padding: 0 5px; }
 
-        /* SIDE PANEL - Micșorat cu 3% pe înălțime și lățime */
+        /* Panel setări compact conform cerinței tale anterioare */
         .side-panel { position: fixed; top: 0; right: 0; width: 78.7%; height: 97%; background: white; z-index: 2000; padding: 18px; box-shadow: -5px 0 20px rgba(0,0,0,0.2); transform: translateX(100%); transition: 0.4s; overflow-y: auto; border-radius: 15px 0 0 15px; }
         .side-panel.open { transform: translateX(0); }
         .side-panel label { display: block; margin-top: 10px; font-weight: bold; color: #333; font-size: 13px; }
         .side-panel input, .side-panel select, .side-panel textarea { width: 100%; padding: 9px; margin-top: 3px; border-radius: 8px; border: 1px solid #ddd; font-size: 13px; }
         .side-panel h3 { font-size: 1.0em; margin-top: 0; }
         .side-panel hr { margin: 12px 0; opacity: 0.3; }
-        .side-panel .lvl-btn { padding: 15px 5px; font-size: 16px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -235,21 +251,27 @@
         });
         let misPool = mistakes.sort(() => 0.5 - Math.random()).slice(0, 2);
         let fresh = pool.sort(() => 0.5 - Math.random()).slice(0, size - misPool.length);
-        fresh.forEach(itm => mistakes = mistakes.filter(m => m.q !== itm.q));
-        curSession = fresh.sort(() => 0.5 - Math.random());
+        curSession = [...misPool, ...fresh].sort(() => 0.5 - Math.random());
         curIdx = 0; score = 0; showQ();
     }
 
     function showQ() {
         if(curIdx >= curSession.length) { 
+            localStorage.removeItem('gm_last_test');
             document.getElementById('reader-display').innerHTML = `<h2>Scor: ${score}/${curSession.length}</h2>`;
-            document.getElementById('test-ui').innerHTML = `<button class="lvl-btn active-lvl" style="width:100%" onclick="goHome()">RESTARTEAZĂ</button>`;
+            document.getElementById('test-ui').innerHTML = `<button class="lvl-btn active-lvl" style="width:100%" onclick="initSmartTest(lastRawBody, lastSetSize)">CONTINUĂ</button>`;
             return; 
         }
+        
+        localStorage.setItem('gm_last_test', JSON.stringify({ session: curSession, idx: curIdx, score: score, lvl: curLvl, body: lastRawBody, size: lastSetSize }));
+
         let itm = curSession[curIdx];
         let qHtml = itm.q.split(/\s+/).map(w => w === '___' ? '<span id="answer-slot" class="blank-space">...</span>' : `<span class="word" onclick="trans(this)">${w}</span>`).join(' ');
         if(!itm.q.includes('___')) qHtml += ' <span id="answer-slot" class="blank-space">...</span>';
+
         document.getElementById('reader-display').innerHTML = `<h3>${qHtml}</h3>`;
+        document.getElementById('reader-display').className = ""; 
+
         let html = itm.all.sort(() => 0.5 - Math.random()).map(o => {
             let optionHtml = o.split(/\s+/).map(ow => `<span class="word" onclick="trans(this)">${ow}</span>`).join(' ');
             return `<div class="test-opt" onclick="evalAns(this, '${o.replace(/'/g, "\\'")}', '${itm.cor.replace(/'/g, "\\'")}')"><div>${optionHtml}</div></div>`;
@@ -265,14 +287,33 @@
         let display = document.getElementById('reader-display');
         let slot = document.getElementById('answer-slot');
         if(slot) slot.innerText = sel;
-        if(sel === cor) { el.classList.add('ans-correct'); display.classList.add('glow-ui'); score++; }
-        else { el.classList.add('ans-wrong'); display.classList.add('shake-ui'); options.forEach(o => { if(o.innerText.trim() === cor) o.classList.add('ans-correct'); }); if(!mistakes.some(m => m.q === itm.q)) mistakes.push(itm); }
+
+        if(sel === cor) {
+            el.classList.add('ans-correct'); display.classList.add('glow-ui');
+            score++; mistakes = mistakes.filter(m => m.q !== itm.q);
+        } else {
+            el.classList.add('ans-wrong'); display.classList.add('shake-ui');
+            options.forEach(o => { if(o.innerText.trim() === cor) o.classList.add('ans-correct'); });
+            if(!mistakes.some(m => m.q === itm.q)) mistakes.push(itm);
+        }
         localStorage.setItem('gm_mistakes', JSON.stringify(mistakes));
-        setTimeout(() => { curIdx++; display.className = ""; showQ(); }, 1800);
+        setTimeout(() => { curIdx++; showQ(); }, 1800);
+    }
+
+    function resumeTest() {
+        let saved = JSON.parse(localStorage.getItem('gm_last_test'));
+        if(saved) {
+            curSession = saved.session; curIdx = saved.idx; score = saved.score; curLvl = saved.lvl; lastRawBody = saved.body; lastSetSize = saved.size;
+            document.getElementById('home-screen').classList.add('hidden');
+            document.getElementById('work-screen').classList.remove('hidden');
+            document.getElementById('test-ui').classList.remove('hidden');
+            showQ();
+        }
     }
 
     function playAll() { synth.cancel(); let ut = new SpeechSynthesisUtterance(document.getElementById('reader-display').innerText); ut.lang = 'de-DE'; ut.rate = config.rate; synth.speak(ut); }
     function playSelect() { let t = window.getSelection().toString(); if(!t) return; synth.cancel(); let ut = new SpeechSynthesisUtterance(t); ut.lang = 'de-DE'; ut.rate = config.rate; synth.speak(ut); }
+    function pauseAudio() { synth.pause(); }
     function stopAudio() { synth.cancel(); }
     function goHome() { document.getElementById('lvl-screen').classList.add('hidden'); document.getElementById('work-screen').classList.add('hidden'); document.getElementById('home-screen').classList.remove('hidden'); document.getElementById('nav-title').innerText = "GERMANA MASTER"; checkResume(); stopAudio(); }
     function backToList() { document.getElementById('work-screen').classList.add('hidden'); document.getElementById('lvl-screen').classList.remove('hidden'); stopAudio(); }
@@ -283,4 +324,3 @@
     function delItem(l, idx) { if(confirm("Ștergi?")) { db[l].splice(idx, 1); localStorage.setItem('gm_db_v3', JSON.stringify(db)); renderList(); } }
 </script>
 </body>
-</html>
