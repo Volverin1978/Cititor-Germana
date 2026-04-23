@@ -314,7 +314,11 @@
         const options = document.querySelectorAll('.test-opt');
         options.forEach(o => o.style.pointerEvents = 'none');
         let slot = document.getElementById('answer-slot');
-        if(slot) slot.innerText = sel;
+        if(slot) {
+            slot.innerText = sel;
+            // Modificare: Schimbă culoarea textului în slot în funcție de corectitudine
+            slot.style.color = (sel === cor) ? "var(--main-green)" : "#dc3545";
+        }
         if(sel === cor) { el.classList.add('ans-correct'); score++; } 
         else { el.classList.add('ans-wrong'); options.forEach(o => { if(o.innerText.trim() === cor) o.classList.add('ans-correct'); }); }
         let itm = curSession[curIdx];
