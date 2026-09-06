@@ -316,7 +316,6 @@
         let slot = document.getElementById('answer-slot');
         if(slot) {
             slot.innerText = sel;
-            // Modificare: Schimbă culoarea textului în slot în funcție de corectitudine
             slot.style.color = (sel === cor) ? "var(--main-green)" : "#dc3545";
         }
         if(sel === cor) { el.classList.add('ans-correct'); score++; } 
@@ -346,14 +345,53 @@
     function renderReading(txt) { document.getElementById('reader-display').innerHTML = txt.split(/\s+/).map(w => `<span class="word" onclick="trans(this)">${w}</span>`).join(' '); }
     
     async function trans(el) {
-        event.stopPropagation();
+        if(event) event.stopPropagation();
         document.querySelectorAll('.word').forEach(w => w.classList.remove('highlight-green'));
         el.classList.add('highlight-green');
-        let w = el.innerText.replace(/[.,!?;:()]/g, '');
+        
+        let rawWord = el.innerText.replace(/[.,!?;:()"'„“»«]/g, '').trim();
+        if(!rawWord) return;
+
+        let transBox = document.getElementById('trans-box');
+        transBox.innerText = "Se traduce...";
+
+        // 1. Încercare cu canalul Google dict-chrome-ex (fără eroare CORS)
         try {
-            let res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=de&tl=ro&dt=t&q=${encodeURIComponent(w)}`);
-            let data = await res.json(); document.getElementById('trans-box').innerText = data[0][0][0];
-        } catch(e) { document.getElementById('trans-box').innerText = "Eroare"; }
+            let res = await fetch(`https://translate.googleapis.com/translate_a/single?client=dict-chrome-ex&sl=de&tl=ro&dt=t&q=${encodeURIComponent(rawWord)}`);
+            if(res.ok) {
+                let data = await res.json();
+                if(data && data[0] && data[0][0] && data[0][0][0]) {
+                    transBox.innerText = data[0][0][0];
+                    return;
+                }
+            }
+        } catch(e) {}
+
+        // 2. Rezervă: MyMemory API (Gratuit și stabil)
+        try {
+            let res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(rawWord)}&langpair=de|ro`);
+            if(res.ok) {
+                let data = await res.json();
+                if(data && data.responseData && data.responseData.translatedText) {
+                    transBox.innerText = data.responseData.translatedText;
+                    return;
+                }
+            }
+        } catch(e) {}
+
+        // 3. Rezervă secundară: Google gtx
+        try {
+            let res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=de&tl=ro&dt=t&q=${encodeURIComponent(rawWord)}`);
+            if(res.ok) {
+                let data = await res.json();
+                if(data && data[0] && data[0][0] && data[0][0][0]) {
+                    transBox.innerText = data[0][0][0];
+                    return;
+                }
+            }
+        } catch(e) {}
+
+        transBox.innerText = "Eroare traducere";
     }
 
     function saveData() { 
