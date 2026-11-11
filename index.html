@@ -120,7 +120,7 @@
     let db = JSON.parse(localStorage.getItem('gm_db_v3') || '{"A1":[],"A2":[],"B1":[],"B2":[],"C1":[],"C2":[]}');
     let config = JSON.parse(localStorage.getItem('gm_config') || '{"bg":"#f0f2f5","font":"24","rate":"1"}');
     let curLvl = '', curTab = 'L', curSession = [], curIdx = 0, score = 0, synth = window.speechSynthesis;
-    let lastRawBody = '', lastSetSize = 10;
+    let lastRawBody = '', lastSetSize = 10, lastShuffle = true;
 
     let appHistory = [];
     let historyIdx = -1;
@@ -183,7 +183,7 @@
     function resumeTest() {
         let saved = JSON.parse(localStorage.getItem('gm_last_test'));
         if(!saved) return;
-        curSession = saved.session; curIdx = saved.idx; score = saved.score; lastRawBody = saved.raw; lastSetSize = saved.size;
+        curSession = saved.session; curIdx = saved.idx; score = saved.score; lastRawBody = saved.raw; lastSetSize = saved.size; lastShuffle = saved.shuffle !== undefined ? saved.shuffle : true;
         document.getElementById('home-screen').classList.add('hidden');
         document.getElementById('work-screen').classList.remove('hidden');
         document.getElementById('test-ui').classList.remove('hidden');
@@ -191,7 +191,7 @@
     }
 
     function saveProgress() {
-        localStorage.setItem('gm_last_test', JSON.stringify({ session: curSession, idx: curIdx, score: score, raw: lastRawBody, size: lastSetSize }));
+        localStorage.setItem('gm_last_test', JSON.stringify({ session: curSession, idx: curIdx, score: score, raw: lastRawBody, size: lastSetSize, shuffle: lastShuffle }));
     }
 
     function loadCfg() {
@@ -253,19 +253,30 @@
     }
 
     function askSize() {
-        document.getElementById('reader-display').innerHTML = `<h3>Câte întrebări dorești?</h3>`;
+        let poolCount = lastRawBody.split('\n').filter(l => l.includes('|')).length;
+        document.getElementById('reader-display').innerHTML = `<h3>Câte întrebări dorești?</h3><p style="font-size:15px; color:#555; margin-top:-5px;">Total întrebări disponibile: <b>${poolCount}</b></p>`;
         document.getElementById('test-ui').innerHTML = `
-            <button class="lvl-btn active-lvl" style="width:100%; margin-bottom:12px; background:#007bff" onclick="initSmartTest(lastRawBody, 999)">♾️ FĂRĂ LIMITĂ (PÂNĂ LA FINAL)</button>
+            <div style="margin-bottom: 15px; background: #f8f9fa; padding: 12px; border-radius: 12px; border: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 16px; font-weight: bold; color: #333;">🔀 Amestecă întrebările (Random)</span>
+                <input type="checkbox" id="shuffle-toggle" checked style="width: 22px; height: 22px; accent-color: var(--main-green); cursor: pointer;">
+            </div>
+            <button class="lvl-btn active-lvl" style="width:100%; margin-bottom:12px; background:#007bff" onclick="initSmartTestFromPrompt(999)">♾️ FĂRĂ LIMITĂ (PÂNĂ LA FINAL)</button>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="lvl-btn active-lvl" onclick="initSmartTest(lastRawBody, 5)">5</button>
-                <button class="lvl-btn active-lvl" onclick="initSmartTest(lastRawBody, 10)">10</button>
-                <button class="lvl-btn active-lvl" onclick="initSmartTest(lastRawBody, 15)">15</button>
-                <button class="lvl-btn active-lvl" onclick="initSmartTest(lastRawBody, 20)">20</button>
+                <button class="lvl-btn active-lvl" onclick="initSmartTestFromPrompt(5)">5</button>
+                <button class="lvl-btn active-lvl" onclick="initSmartTestFromPrompt(10)">10</button>
+                <button class="lvl-btn active-lvl" onclick="initSmartTestFromPrompt(15)">15</button>
+                <button class="lvl-btn active-lvl" onclick="initSmartTestFromPrompt(20)">20</button>
             </div>`;
     }
 
-    function initSmartTest(raw, size) {
+    function initSmartTestFromPrompt(sizeOption) {
+        let shuffle = document.getElementById('shuffle-toggle').checked;
+        initSmartTest(lastRawBody, sizeOption, shuffle);
+    }
+
+    function initSmartTest(raw, size, shuffle = true) {
         lastSetSize = size;
+        lastShuffle = shuffle;
         let pool = raw.split('\n').filter(l => l.includes('|')).map(line => {
             let p = line.split('|').map(x => x.trim());
             let q = p[0], cor = p[1], variants = p.slice(1), expl = "";
@@ -274,7 +285,12 @@
             }
             return { q, cor, expl, all: variants };
         });
-        curSession = pool.sort(() => 0.5 - Math.random()).slice(0, size);
+        
+        if (shuffle) {
+            pool = pool.sort(() => 0.5 - Math.random());
+        }
+
+        curSession = pool.slice(0, size);
         curIdx = 0; score = 0; saveProgress(); showQ();
     }
 
@@ -292,7 +308,7 @@
             document.getElementById('reader-display').innerHTML = `<h2>Final! Scor: ${score}/${curSession.length}</h2>`;
             document.getElementById('btn-back-main').classList.add('hidden');
             document.getElementById('test-ui').innerHTML = `
-                <button class="lvl-btn active-lvl" style="width:100%; margin-bottom:12px" onclick="initSmartTest(lastRawBody, lastSetSize)">🚀 URMĂTORUL SET (RANDOM)</button>
+                <button class="lvl-btn active-lvl" style="width:100%; margin-bottom:12px" onclick="initSmartTest(lastRawBody, lastSetSize, lastShuffle)">🚀 URMĂTORUL SET</button>
                 <button class="lvl-btn" style="width:100%; background:#6c757d" onclick="backToList()">⬅️ ÎNAPOI LA LISTĂ</button>`;
             return; 
         }
@@ -355,7 +371,6 @@
         let transBox = document.getElementById('trans-box');
         transBox.innerText = "Se traduce...";
 
-        // 1. Încercare cu canalul Google dict-chrome-ex (fără eroare CORS)
         try {
             let res = await fetch(`https://translate.googleapis.com/translate_a/single?client=dict-chrome-ex&sl=de&tl=ro&dt=t&q=${encodeURIComponent(rawWord)}`);
             if(res.ok) {
@@ -367,7 +382,6 @@
             }
         } catch(e) {}
 
-        // 2. Rezervă: MyMemory API (Gratuit și stabil)
         try {
             let res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(rawWord)}&langpair=de|ro`);
             if(res.ok) {
@@ -379,7 +393,6 @@
             }
         } catch(e) {}
 
-        // 3. Rezervă secundară: Google gtx
         try {
             let res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=de&tl=ro&dt=t&q=${encodeURIComponent(rawWord)}`);
             if(res.ok) {
