@@ -93,9 +93,10 @@
     <div id="expl-container"></div>
     <div id="test-ui" class="hidden" style="margin-top:20px;"></div>
     
-    <!-- AICI AM ADAUGAT BUTONUL DE SKIP FĂRĂ A MODIFICA RESTUL -->
-    <div id="skip-ui" class="hidden" style="margin-top:10px;">
-        <button class="lvl-btn" style="width:100%; background:#ffc107; color:#333;" onclick="skipQ()">⏭️ SARI PESTE</button>
+    <!-- AICI AM ADAUGAT CELE DOUĂ BUTOANE ALĂTURATE (SARI PESTE + ARATĂ RĂSPUNSUL) -->
+    <div id="skip-ui" class="hidden" style="margin-top:10px; display:flex; gap:10px;">
+        <button class="lvl-btn" style="flex:1; background:#ffc107; color:#333; font-size:16px;" onclick="skipQ()">⏭️ SARI</button>
+        <button class="lvl-btn" style="flex:1; background:#17a2b8; color:white; font-size:16px;" onclick="revealCorrect()">💡 RĂSPUNS</button>
     </div>
 
     <div id="next-ui" class="hidden" style="margin-top:20px;">
@@ -128,7 +129,6 @@
     let curLvl = '', curTab = 'L', curSession = [], curIdx = 0, score = 0, synth = window.speechSynthesis;
     let lastRawBody = '', lastSetSize = 10, lastShuffle = true;
 
-    // NOI VARIABILE PENTRU FUNCȚIONALITATEA CERUTĂ
     let skippedQuestions = [];
     let wrongQuestions = [];
 
@@ -318,13 +318,12 @@
         document.getElementById('trans-box').innerText = "Apasă pe cuvinte pentru traducere";
         document.getElementById('expl-container').style.display = 'none';
         document.getElementById('next-ui').classList.add('hidden');
-        document.getElementById('skip-ui').classList.remove('hidden'); // Afișează butonul Sari peste
+        document.getElementById('skip-ui').classList.remove('hidden'); // Afișează butoanele Sari și Răspuns
         document.getElementById('btn-back-main').classList.remove('hidden');
 
         if(!skipHistory && curIdx < curSession.length) saveState('work-screen', `Întrebarea ${curIdx + 1}`, curIdx);
         
         if(curIdx >= curSession.length) { 
-            // Dacă am terminat runda curentă, dar avem întrebări sărite, le adăugăm în sesiune pentru a fi afișate acum la sfârșit
             if (skippedQuestions.length > 0) {
                 curSession = [...skippedQuestions];
                 skippedQuestions = [];
@@ -340,7 +339,6 @@
             document.getElementById('btn-back-main').classList.add('hidden');
             document.getElementById('skip-ui').classList.add('hidden');
             
-            // CONSTRUIRE BUTOANE SPECIALE PENTRU GREȘITE / RESTART
             let extraButtons = '';
             if (wrongQuestions.length > 0) {
                 extraButtons += `<button class="lvl-btn active-lvl" style="width:100%; margin-bottom:12px; background:#dc3545;" onclick="retryWrong()">🔁 REFĂ DOAR ÎNTREBĂRILE GREȘITE (${wrongQuestions.length})</button>`;
@@ -365,20 +363,43 @@
         document.getElementById('test-ui').innerHTML = html;
     }
 
-    // FUNCȚIE PENTRU A SĂRI PESTE O ÎNTREBARE
     function skipQ() {
         let itm = curSession[curIdx];
-        skippedQuestions.push(itm); // O salvăm pentru a apărea la sfârșit
+        skippedQuestions.push(itm);
         curIdx++;
         saveProgress();
         showQ();
+    }
+
+    // FUNCȚIE NOUĂ: SELECTEAZĂ AUTOMAT RĂSPUNSUL CORECT
+    function revealCorrect() {
+        let itm = curSession[curIdx];
+        const options = document.querySelectorAll('.test-opt');
+        options.forEach(o => {
+            o.style.pointerEvents = 'none';
+            if(o.innerText.trim() === itm.cor.trim()) {
+                o.classList.add('ans-correct');
+            }
+        });
+        document.getElementById('skip-ui').classList.add('hidden');
+        let slot = document.getElementById('answer-slot');
+        if(slot) {
+            slot.innerText = itm.cor;
+            slot.style.color = "var(--main-green)";
+        }
+        score++; // Se punctează automat ca fiind corect
+        if(itm.expl) { 
+            document.getElementById('expl-container').innerHTML = `<strong>Explicație:</strong><br>${itm.expl}`; 
+            document.getElementById('expl-container').style.display = 'block'; 
+        }
+        document.getElementById('next-ui').classList.remove('hidden');
     }
 
     function evalAns(el, sel, cor) {
         if(event.target.classList.contains('word')) return;
         const options = document.querySelectorAll('.test-opt');
         options.forEach(o => o.style.pointerEvents = 'none');
-        document.getElementById('skip-ui').classList.add('hidden'); // Ascundem butonul skip după răspuns
+        document.getElementById('skip-ui').classList.add('hidden');
 
         let slot = document.getElementById('answer-slot');
         if(slot) {
@@ -392,7 +413,6 @@
         } else { 
             el.classList.add('ans-wrong'); 
             options.forEach(o => { if(o.innerText.trim() === cor) o.classList.add('ans-correct'); }); 
-            // O salvăm în lista de greșite pentru a putea fi refăcută la final
             if(!wrongQuestions.some(w => w.q === itm.q)) {
                 wrongQuestions.push(itm);
             }
@@ -401,7 +421,6 @@
         document.getElementById('next-ui').classList.remove('hidden');
     }
 
-    // FUNCȚIE PENTRU A REFACE DOAR ÎNTREBĂRILE GREȘITE LA FINAL
     function retryWrong() {
         curSession = [...wrongQuestions];
         wrongQuestions = [];
